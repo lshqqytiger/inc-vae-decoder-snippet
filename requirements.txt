@@ -1,0 +1,7 @@
+diffusers
+transformers
+accelerate
+torch==1.13.1
+onnxruntime-directml
+olive-ai
+neural-compressor

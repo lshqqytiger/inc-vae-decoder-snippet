@@ -1,0 +1,8 @@
+**/__pycache__
+
+model_cache/*
+model_quantized/*
+
+cache
+footprints
+nc_workspace

@@ -1,0 +1,69 @@
+{
+  "input_model": {
+    "type": "PyTorchModel",
+    "config": {
+      "model_path": "",
+      "model_loader": "text_encoder_load",
+      "model_script": "olive_script.py",
+      "io_config": {
+        "input_names": ["input_ids"],
+        "output_names": ["last_hidden_state", "pooler_output"],
+        "dynamic_axes": { "input_ids": { "0": "batch", "1": "sequence" } }
+      },
+      "dummy_inputs_func": "text_encoder_conversion_inputs"
+    }
+  },
+  "systems": {
+    "local_system": {
+      "type": "LocalSystem",
+      "config": { "accelerators": ["gpu"] }
+    }
+  },
+  "evaluators": {
+    "common_evaluator": {
+      "metrics": [
+        {
+          "name": "latency",
+          "type": "latency",
+          "sub_types": [{ "name": "avg" }],
+          "user_config": {
+            "user_script": "olive_script.py",
+            "dataloader_func": "text_encoder_data_loader",
+            "batch_size": 1
+          }
+        }
+      ]
+    }
+  },
+  "passes": {
+    "convert": {
+      "type": "OnnxConversion",
+      "config": {
+        "target_opset": 14
+      }
+    },
+    "quantization": {
+      "type": "IncDynamicQuantization",
+      "disable_search": true,
+      "config": {
+        "save_as_external_data": false,
+        "all_tensors_to_one_file": true
+      }
+    }
+  },
+  "pass_flows": [["convert", "quantization"]],
+  "engine": {
+    "search_strategy": {
+      "execution_order": "joint",
+      "search_algorithm": "exhaustive"
+    },
+    "evaluator": "common_evaluator",
+    "evaluate_input_model": false,
+    "host": "local_system",
+    "target": "local_system",
+    "cache_dir": "cache",
+    "output_name": "text_encoder",
+    "output_dir": "footprints",
+    "execution_providers": ["DmlExecutionProvider"]
+  }
+}
