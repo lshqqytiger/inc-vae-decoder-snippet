@@ -71,6 +71,10 @@ def run_olive():
     out_dir = os.path.join("./model_quantized", dir_name)
 
     init_dict = load_init_dict(diffusers.StableDiffusionPipeline, in_dir)
+    del init_dict["vae"]
+    for k in init_dict:
+        if k in submodels_sd:
+            init_dict[k] = ["diffusers", "OnnxRuntimeModel"]
 
     try:
         shutil.rmtree("cache", ignore_errors=True)

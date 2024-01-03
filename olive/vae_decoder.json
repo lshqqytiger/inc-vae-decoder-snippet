@@ -54,7 +54,11 @@
       "disable_search": true,
       "config": {
         "save_as_external_data": false,
-        "all_tensors_to_one_file": true
+        "all_tensors_to_one_file": true,
+        "recipes": {
+          "first_conv_or_matmul_quantization": false,
+          "last_conv_or_matmul_quantization": false
+        }
       }
     }
   },
